@@ -1,92 +1,74 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<!-- Libraries:
 			Leaflet: Used to display the map/locations
 			PapaParse: Used to parse the CSV file for the locations
+			JQuery: Useful framework for general display
 	-->
 	<title>Map Test Website</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+
 	<!-- TODO: Make this a real icon -->
 	<!-- <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" /> -->
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+	<!-- Style -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+		crossorigin="" />
+	<link rel="stylesheet" type="text/css" href="./map-test.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- Scripts -->
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
 	<script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="./map-test.js" type="text/javascript"></script>
+
+	<title>Web Serials</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
+
 <body>
 
+	<!-- Creates the Navbar  -->
+	<div class="navbar navbar-inverse">
+		<div class="container">
+			<ul>
+				<div class="navbar-header">
 
+					<a href="" class="navbar-brand">Mapping Data</a>
 
-<div id="mapid" style="width: 1000px; height: 800px;"></div>
-<button onclick="SwitchButtonClicked()"> Switch CSV</button>
-<div id="csvDiv">haunted-places.csv</div>
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+						<span class="glyphicon glyphicon-menu-hamburger" style="color:gray"></span>
+					</button>
 
-<script>
+				</div>
 
-	var mymap = L.map('mapid');
-	var layerGroup = L.layerGroup().addTo(mymap);
+				<div class="collapse navbar-collapse" id="myNavbar">
 
-	var useCoalesce = false;
-	
-	function CreateMap(){
-		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-			id: 'mapbox/streets-v11',
-			tileSize: 512,
-			zoomOffset: -1
-		}).addTo(mymap);
-		
-		mymap.setView([28.5383, -81.3792], 13);
+					<ul class="nav navbar-nav">
+						<li id="item1Nav"><a href=""><span class="glyphicon glyphicon-record"></span> Item 1</a></li>
+						<li id="item2Nav"><a href=""><span class="glyphicon glyphicon-tower"></span> Item 2</a></li>
+						<li id="item3Nav"><a href=""><span class="glyphicon glyphicon-tint"></span> Item 3</a></li>
+						<li id="item4Nav"><a href=""><span class="glyphicon glyphicon-education"></span> Item 4</a></li>
+					</ul>
 
-	}
-	
-	//Data from https://data.world/timothyrenner/haunted-places
-	async function GetCSVData(csvName){
-	    const response = await fetch(csvName); 
-        const data = await response.text();
-		
-		const parsedData = Papa.parse(data, {header: true});
+				</div>
+			</ul>
+		</div>
+	</div>
 
-		parsedData.data.forEach(row => {
-			if(row["latitude"] != null && row["longitude"] != null){
-				var marker = L.marker([row["latitude"], row["longitude"]]).addTo(layerGroup);
-
-				marker.bindPopup("<h3>" + row["location"] + "</h3> <br/> " + row["description"]);
-				marker.on('mouseover', function (e) {
-					this.openPopup();
-				});
-        		marker.on('mouseout', function (e) {
-            		this.closePopup();
-        		});
-			}
-		});
-	}
-
-	function SwitchButtonClicked(){
-		//Switches whether or not to use the coalescing CSV
-		useCoalesce = !useCoalesce;
-		
-		//Clears all markers
-		layerGroup.clearLayers();
-		
-		document.getElementById('csvDiv').innerHTML = useCoalesce ? "haunted-places-coalesce.csv" : "haunted-places.csv";
-		GetCSVData(useCoalesce ? "haunted-places-coalesce.csv" : "haunted-places.csv");
-	}
-
-	//Function calls
-	CreateMap();
-	GetCSVData("haunted-places.csv");
-
-</script>
-
-
+	<div id="mapid"></div>
 
 </body>
+
 </html>
