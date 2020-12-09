@@ -13,6 +13,11 @@ nav {
     padding:0;
 }
 
+.scrollbox {
+    overflow-y: auto;
+    max-height: 400px;
+}
+
 #mapid{
     width:100%;
     height:90%;
